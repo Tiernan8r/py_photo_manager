@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # py_photo_manager
 # Copyright (C) 2022 Tiernan8r
 #
@@ -13,18 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-import sys
-
-# Required to guarantee that the 'ppm' module is accessible when
-# this file is run directly.
-if os.getcwd() not in sys.path:
-    sys.path.append(os.getcwd())
+import pytest
+from ppm import main
 
 
-def main():
-    sys.exit(0)
-
-
-if __name__ == "__main__":
-    main()
+def test_main():
+    with pytest.raises(SystemExit) as se:
+        main.main()
+    assert se.match("0")
