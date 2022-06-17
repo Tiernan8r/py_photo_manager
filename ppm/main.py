@@ -25,6 +25,10 @@ from PySide6.QtWidgets import QApplication
 from ppm.main_window import MainWindow
 
 
+def main():
+    sys.exit(0)
+
+
 def initialise_ui():
     app = QApplication(sys.argv)
     main_window = MainWindow()
