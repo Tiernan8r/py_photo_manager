@@ -13,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import multiprocessing
 import os
 import sys
 
@@ -24,7 +23,7 @@ if os.getcwd() not in sys.path:
 
 
 def main():
-    pass
+    return
 
 
 if __name__ == "__main__":
