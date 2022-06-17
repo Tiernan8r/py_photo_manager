@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # py_photo_manager
 # Copyright (C) 2022 Tiernan8r
 #
@@ -13,25 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-import sys
+"""
+File where all constants related to UI functionality are defined.
+"""
 
-# Required to guarantee that the 'ppm' module is accessible when
-# this file is run directly.
-if os.getcwd() not in sys.path:
-    sys.path.append(os.getcwd())
-
-from PySide6.QtWidgets import QApplication
-from ppm.main_window import MainWindow
-
-
-def initialise_ui():
-    app = QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
-
-    sys.exit(app.exec())
-
-
-if __name__ == "__main__":
-    initialise_ui()
+#: The filename where the ui layout is defined in XML.
+UI_FILENAME = "form.ui"
+#: The widg
+#: The duration in seconds to wait for a thread to initialise when started.
+THREAD_PAUSE = 0.01
