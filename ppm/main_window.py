@@ -18,7 +18,9 @@ import sys
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow
-from qcp.gui.constants import UI_FILENAME
+
+from ppm.constants import UI_FILENAME
+from PySide6.QtGui import QImageReader
 
 
 class MainWindow(QMainWindow):
@@ -38,6 +40,8 @@ class MainWindow(QMainWindow):
 
         self.ui_component = self.load_ui()
         self.ui_component.setWindowTitle("Photo Manager")
+
+        print(QImageReader.supportedImageFormats())
 
     def show(self):
         """
