@@ -22,6 +22,7 @@ if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
 
 from PySide6.QtWidgets import QApplication
+
 from ppm.main_window import MainWindow
 
 
