@@ -6,6 +6,8 @@
 #
 attrs==21.4.0
     # via pytest
+autopep8==1.6.0
+    # via -r test-requirements.in
 click==8.1.3
     # via pip-tools
 coverage[toml]==6.4.1
@@ -45,7 +47,9 @@ py==1.11.0
     #   pytest
     #   tox
 pycodestyle==2.8.0
-    # via flake8
+    # via
+    #   autopep8
+    #   flake8
 pyflakes==2.4.0
     # via flake8
 pyparsing==3.0.9
@@ -64,7 +68,9 @@ six==1.16.0
     #   tox
     #   virtualenv
 toml==0.10.2
-    # via tox
+    # via
+    #   autopep8
+    #   tox
 tomli==2.0.1
     # via
     #   coverage
