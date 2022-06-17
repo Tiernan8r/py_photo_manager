@@ -1,9 +1,9 @@
 name: Tox
 on:
   push:
-    branches: [ master ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ master ]
+    branches: [ "main" ]
 jobs:
   # First, use tox-gh-matrix to construct a build matrix
   # from your tox.ini:
