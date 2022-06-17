@@ -23,7 +23,7 @@ if os.getcwd() not in sys.path:
 
 
 def main():
-    return
+    sys.exit(0)
 
 
 if __name__ == "__main__":
