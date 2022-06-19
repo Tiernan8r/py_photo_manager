@@ -16,11 +16,11 @@ import os
 import sys
 
 from PySide6.QtCore import QFile, QIODevice
+from PySide6.QtGui import QImageReader
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QWidget
 
 from ppm.constants import UI_FILENAME
-from PySide6.QtGui import QImageReader
 
 
 class MainWindow(QMainWindow):
@@ -49,13 +49,13 @@ class MainWindow(QMainWindow):
         """
         self.ui_component.show()
 
-    def load_ui(self) -> QMainWindow:
+    def load_ui(self) -> QWidget:
         """
         Reads the UI XML file and converts it into a QT widget,
         and returns the widget
 
         returns:
-            QMainWindow: The Main Window element of our UI, with widget
+            QWidget: The Main Window element of our UI, with widget
             elements laid out as defined in the UI file.
         """
         # Load in the 'form.ui' file where the ui layout is defined

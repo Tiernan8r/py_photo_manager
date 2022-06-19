@@ -22,7 +22,16 @@ if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
 
 from PySide6.QtWidgets import QApplication
+
 from ppm.main_window import MainWindow
+
+
+def initialise_ui():
+    app = QApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.show()
+
+    sys.exit(app.exec())
 
 
 def initialise_ui():

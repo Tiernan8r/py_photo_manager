@@ -160,3 +160,6 @@ test-reports
 # LaTeX related files:
 docs/report/*.gz
 docs/report/*.pdf
+
+# Ignore QTCreator project files:
+*.pyproject.user
