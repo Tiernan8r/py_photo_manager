@@ -34,13 +34,5 @@ def initialise_ui():
     sys.exit(app.exec())
 
 
-def initialise_ui():
-    app = QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
-
-    sys.exit(app.exec())
-
-
 if __name__ == "__main__":
     initialise_ui()
