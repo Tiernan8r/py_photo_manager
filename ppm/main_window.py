@@ -19,9 +19,8 @@ from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QWidget
 
-from ppm.constants import UI_FILENAME
-import ppm.images as img
 import ppm.components as comp
+from ppm.constants import UI_FILENAME
 
 
 class MainWindow(comp.MainWindowComponent):
