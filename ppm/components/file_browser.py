@@ -12,21 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from fileinput import filename
+import os
 from typing import List
 
 from ppm.components import AbstractComponent
 from ppm.components.constants import FOLDER_BROWSE_BUTTON, FOLDER_PATH
+from ppm.components.file_viewer import FileViewerComponent
 from ppm.components.main_window import MainWindowComponent
 from PySide6 import QtCore, QtWidgets
 
 
 class FileBrowserComponent(AbstractComponent):
 
-    _path = ""
+    _path = os.path.expanduser("~")
 
-    def __init__(self, main_window: MainWindowComponent,
-                 *args, **kwargs):
+    def __init__(self, main_window: MainWindowComponent, file_viewer: FileViewerComponent,
+                 * args, **kwargs):
         """
         Initialise the FileBrowserComponent object, referencing the main window
         element.
@@ -37,7 +38,11 @@ class FileBrowserComponent(AbstractComponent):
             to QtCore.QObject
         :param **kwargs: dictionary parameters to pass to QtCore.QObject
         """
+        self.file_viewer = file_viewer
         super().__init__(main_window, *args, **kwargs)
+
+        # Set the path label to the default initially
+        self.set_path_label()
 
     def setup_signals(self):
         super().setup_signals()
@@ -58,11 +63,15 @@ class FileBrowserComponent(AbstractComponent):
             if bt.objectName() == FOLDER_BROWSE_BUTTON:
                 self.browse_button = bt
 
+    def set_path_label(self):
+        self.folder_path_label.setText(self._path)
+
     @QtCore.Slot()
     def browse_files(self):
         dlg = QtWidgets.QFileDialog()
         dlg.setFileMode(QtWidgets.QFileDialog.Directory)
         dlg.setViewMode(QtWidgets.QFileDialog.List)
+        dlg.setDirectory(self._path)
 
         filenames = []
         if dlg.exec():
@@ -71,4 +80,6 @@ class FileBrowserComponent(AbstractComponent):
         assert len(filenames) == 1
 
         self._path = filenames[0]
-        self.folder_path_label.setText(filenames[0])
+        self.set_path_label()
+
+        self.file_viewer.populate_thumbnails(self._path)

@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-IMAGE_VIEWER_WIDGET = "images_list"
-
 FOLDER_PATH = "folder_location"
 FOLDER_BROWSE_BUTTON = "browse_folder_location"
+
+IMAGE_THUMBNAIL_VIEW = "image_thumbnails"

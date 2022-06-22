@@ -42,8 +42,8 @@ class MainWindow(comp.MainWindowComponent):
         self.ui_component = self.load_ui()
         self.ui_component.setWindowTitle("Photo Manager")
 
-        self.file_browser = comp.FileBrowserComponent(self)
         self.file_viewer = comp.FileViewerComponent(self)
+        self.file_browser = comp.FileBrowserComponent(self, self.file_viewer)
 
     def show(self):
         """
