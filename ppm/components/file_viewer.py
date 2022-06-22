@@ -86,13 +86,14 @@ class FileViewerComponent(AbstractComponent):
             img_label.setPixmap(pixmap)
             text_label.setText(file.name)
 
-            img_label.mousePressEvent = \
-                lambda e, \
-                index=row_in_grid_layout, \
-                file_path=full_path: \
-                self.on_thumbnail_click(e, index, file_path)
+            def custom_mouse_press(event,
+                                   index=row_in_grid_layout,
+                                   file_path=full_path):
+                self.on_thumbnail_click(event, index, file_path)
 
-            text_label.mousePressEvent = img_label.mousePressEvent
+            img_label.mousePressEvent = custom_mouse_press  # type: ignore
+            text_label.mousePressEvent = custom_mouse_press  # type: ignore
+
             thumbnail = QtWidgets.QBoxLayout(
                 QtWidgets.QBoxLayout.TopToBottom)
             thumbnail.addWidget(img_label)
