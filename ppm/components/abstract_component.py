@@ -12,34 +12,36 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from typing import List
-
-from ppm.components import AbstractComponent
-from ppm.components.constants import IMAGE_VIEWER_WIDGET
 from ppm.components.main_window import MainWindowComponent
-from PySide6 import QtWidgets
+from PySide6 import QtCore
 
 
-class FileViewerComponent(AbstractComponent):
+class AbstractComponent(QtCore.QObject):
 
-    def __init__(self, main_window: MainWindowComponent,
-                 *args, **kwargs):
+    def __init__(self, main_window: MainWindowComponent, *args, **kwargs):
         """
-        Initialise the FileViewerComponent object, referencing the main window
-        element.
+        Setup the UI component, referencing the MainWindow UI element
 
-        :param QtWidgets.QMainWindow main_window: The main window element of
-            the UI.
+        :param QtWidgets.QMainWindow main_window: The main window
+            element of our UI.
         :param *args: variable length extra arguments to pass down
             to QtCore.QObject
         :param **kwargs: dictionary parameters to pass to QtCore.QObject
         """
-        super().__init__(main_window, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.main_window = main_window
+        self.setup_signals()
+
+    def setup_signals(self):
+        """
+        Setup any UI signals and events associated with interacting with
+        this part of the UI.
+        """
+        self._find_widgets()
 
     def _find_widgets(self):
-        list_views: List[QtWidgets.QListWidget] = \
-            self.main_window.ui_component.findChildren(
-                QtWidgets.QListWidget)
-        for lv in list_views:
-            if lv.objectName() == IMAGE_VIEWER_WIDGET:
-                self.image_list = lv
+        """
+        Searches the UI elements to get python object references to the ones
+        that are relevant to the operation of this UI component.
+        """
+        pass

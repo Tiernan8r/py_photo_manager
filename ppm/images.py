@@ -12,9 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from ppm.components.abstract_component import \
-    AbstractComponent  # noqa: F401, E501
-from ppm.components.file_browser import \
-    FileBrowserComponent  # noqa: F401, E501
-from ppm.components.file_viewer import FileViewerComponent  # noqa: F401, E501
-from ppm.components.main_window import MainWindowComponent  # noqa: F401, E501
+from typing import List
+
+from PySide6.QtGui import QImageReader
+
+
+def supported_image_formats() -> List[str]:
+    fmts = QImageReader.supportedImageFormats()
+
+    return [fmt.toStdString() for fmt in fmts]
+
+
+def is_supported_image_format(fmt: str) -> bool:
+    return fmt in supported_image_formats()

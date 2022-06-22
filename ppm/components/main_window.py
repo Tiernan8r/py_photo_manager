@@ -12,19 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-import sys
-
-from PySide6.QtCore import QFile, QIODevice
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QWidget
-
-from ppm.constants import UI_FILENAME
-import ppm.images as img
-import ppm.components as comp
+from PySide6.QtWidgets import QMainWindow, QWidget
 
 
-class MainWindow(comp.MainWindowComponent):
+class MainWindowComponent(QMainWindow):
     """
     A Class to handle the behaviour of the overall UI window
     """
@@ -39,17 +30,11 @@ class MainWindow(comp.MainWindowComponent):
         """
         super().__init__(*args, **kwargs)
 
-        self.ui_component = self.load_ui()
-        self.ui_component.setWindowTitle("Photo Manager")
-
-        self.file_browser = comp.FileBrowserComponent(self)
-        self.file_viewer = comp.FileViewerComponent(self)
-
     def show(self):
         """
         Shows the loaded UI if hidden.
         """
-        self.ui_component.show()
+        raise NotImplementedError()
 
     def load_ui(self) -> QWidget:
         """
@@ -60,21 +45,4 @@ class MainWindow(comp.MainWindowComponent):
             QWidget: The Main Window element of our UI, with widget
             elements laid out as defined in the UI file.
         """
-        # Load in the 'form.ui' file where the ui layout is defined
-        path = os.path.join(os.path.dirname(__file__), UI_FILENAME)
-        ui_file = QFile(path)
-
-        if not ui_file.open(QIODevice.ReadOnly):  # type: ignore
-            print(f"Cannot open {UI_FILENAME}: {ui_file.errorString()}")
-            sys.exit(-1)
-
-        # Load the file using the QT UI loader class and return the
-        # ui widget representing the layout
-        loader = QUiLoader()
-        ui_window = loader.load(ui_file)
-        ui_file.close()
-        if not ui_window:
-            print(loader.errorString())
-            sys.exit(-1)
-
-        return ui_window
+        raise NotImplementedError()

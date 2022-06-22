@@ -12,9 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from ppm.components.abstract_component import \
-    AbstractComponent  # noqa: F401, E501
-from ppm.components.file_browser import \
-    FileBrowserComponent  # noqa: F401, E501
-from ppm.components.file_viewer import FileViewerComponent  # noqa: F401, E501
-from ppm.components.main_window import MainWindowComponent  # noqa: F401, E501
+IMAGE_VIEWER_WIDGET = "images_list"
+
+FOLDER_PATH = "folder_location"
+FOLDER_BROWSE_BUTTON = "browse_folder_location"
