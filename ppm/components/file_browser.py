@@ -26,7 +26,8 @@ class FileBrowserComponent(AbstractComponent):
 
     _path = os.path.expanduser("~")
 
-    def __init__(self, main_window: MainWindowComponent, file_viewer: FileViewerComponent,
+    def __init__(self, main_window: MainWindowComponent,
+                 file_viewer: FileViewerComponent,
                  * args, **kwargs):
         """
         Initialise the FileBrowserComponent object, referencing the main window
@@ -53,12 +54,12 @@ class FileBrowserComponent(AbstractComponent):
         labels: List[QtWidgets.QLineEdit] = \
             self.main_window.ui_component.findChildren(
                 QtWidgets.QLineEdit)
-        for l in labels:
-            if l.objectName() == FOLDER_PATH:
-                self.folder_path_label = l
+        for lab in labels:
+            if lab.objectName() == FOLDER_PATH:
+                self.folder_path_label = lab
 
-        buttons: List[QtWidgets.QPushButton] = self.main_window.ui_component.findChildren(
-            QtWidgets.QPushButton)
+        buttons: List[QtWidgets.QPushButton] = \
+            self.main_window.ui_component.findChildren(QtWidgets.QPushButton)
         for bt in buttons:
             if bt.objectName() == FOLDER_BROWSE_BUTTON:
                 self.browse_button = bt

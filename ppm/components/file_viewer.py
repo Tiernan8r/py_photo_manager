@@ -46,7 +46,8 @@ class FileViewerComponent(AbstractComponent):
                 self.image_thumbnails = sa
 
     def _supported_image_formats(self) -> List[str]:
-        return [img.toStdString() for img in QtGui.QImageReader.supportedImageFormats()]
+        return [img.toStdString() for img in
+                QtGui.QImageReader.supportedImageFormats()]
 
     def populate_thumbnails(self, dir: str):
         print("Finding images in directory:", dir)
@@ -56,7 +57,7 @@ class FileViewerComponent(AbstractComponent):
         self.grid_layout.setVerticalSpacing(30)
 
         row_in_grid_layout = 0
-        first_img_file_path = ""
+        # first_img_file_path = ""
 
         for file in os.scandir(dir):
             # TODO: Show subdirs
@@ -100,8 +101,8 @@ class FileViewerComponent(AbstractComponent):
             self.grid_layout.addLayout(
                 thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
 
-            if row_in_grid_layout == 0:
-                first_img_file_path = full_path
+            # if row_in_grid_layout == 0:
+            #     first_img_file_path = full_path
             row_in_grid_layout += 1
 
         # Automatically select the first file in the list during init
