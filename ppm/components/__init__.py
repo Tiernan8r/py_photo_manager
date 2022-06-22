@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # py_photo_manager
 # Copyright (C) 2022 Tiernan8r
 #
@@ -13,26 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-import sys
-
-# Required to guarantee that the 'ppm' module is accessible when
-# this file is run directly.
-if os.getcwd() not in sys.path:
-    sys.path.append(os.getcwd())
-
-from PySide6.QtWidgets import QApplication
-
-from ppm.main_window import MainWindow
-
-
-def initialise_ui():
-    app = QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
-
-    sys.exit(app.exec())
-
-
-if __name__ == "__main__":
-    initialise_ui()
+from ppm.components.abstract_component import \
+    AbstractComponent  # noqa: F401, E501
+from ppm.components.file_browser import \
+    FileBrowserComponent  # noqa: F401, E501
+from ppm.components.file_viewer import FileViewerComponent  # noqa: F401, E501
+from ppm.components.main_window import MainWindowComponent  # noqa: F401, E501
