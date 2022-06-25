@@ -21,3 +21,5 @@ UI_FILENAME = "form.ui"
 #: The widg
 #: The duration in seconds to wait for a thread to initialise when started.
 THREAD_PAUSE = 0.01
+
+LOG_FILENAME = "logging.json"
