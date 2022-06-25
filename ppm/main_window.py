@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import logging
 import os
 import sys
 
@@ -21,6 +22,8 @@ from PySide6.QtWidgets import QWidget
 
 import ppm.components as comp
 from ppm.constants import UI_FILENAME
+
+logger = logging.getLogger(__name__)
 
 
 class MainWindow(comp.MainWindowComponent):
@@ -38,8 +41,12 @@ class MainWindow(comp.MainWindowComponent):
         """
         super().__init__(*args, **kwargs)
 
+        logger.debug("Loading UI file")
+
         self.ui_component = self.load_ui()
         self.ui_component.setWindowTitle("Photo Manager")
+
+        logger.debug("Initialising window components")
 
         self.file_viewer = comp.FileViewerComponent(self)
         self.file_browser = comp.FileBrowserComponent(self, self.file_viewer)
@@ -63,8 +70,8 @@ class MainWindow(comp.MainWindowComponent):
         path = os.path.join(os.path.dirname(__file__), UI_FILENAME)
         ui_file = QFile(path)
 
-        if not ui_file.open(QIODevice.ReadOnly):  # type: ignore
-            print(f"Cannot open {UI_FILENAME}: {ui_file.errorString()}")
+        if not ui_file.open(QIODevice.ReadOnly):
+            logger.error(f"Cannot open {UI_FILENAME}: {ui_file.errorString()}")
             sys.exit(-1)
 
         # Load the file using the QT UI loader class and return the
@@ -73,7 +80,9 @@ class MainWindow(comp.MainWindowComponent):
         ui_window = loader.load(ui_file)
         ui_file.close()
         if not ui_window:
-            print(loader.errorString())
+            logger.error(loader.errorString())
             sys.exit(-1)
+
+        logger.debug("Successfully loaded UI file")
 
         return ui_window

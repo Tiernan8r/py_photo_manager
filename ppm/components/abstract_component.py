@@ -12,8 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import logging
+
 from ppm.components.main_window import MainWindowComponent
 from PySide6 import QtCore
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractComponent(QtCore.QObject):
@@ -28,6 +32,7 @@ class AbstractComponent(QtCore.QObject):
             to QtCore.QObject
         :param **kwargs: dictionary parameters to pass to QtCore.QObject
         """
+        logger.debug("Initialising AbstractComponent")
         super().__init__(*args, **kwargs)
         self.main_window = main_window
         self.setup_signals()
@@ -37,6 +42,8 @@ class AbstractComponent(QtCore.QObject):
         Setup any UI signals and events associated with interacting with
         this part of the UI.
         """
+        logger.debug("Setting up AbstractComponent signals")
+        logger.debug("Finding widgets...")
         self._find_widgets()
 
     def _find_widgets(self):

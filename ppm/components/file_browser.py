@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import logging
 import os
 from typing import List
 
@@ -20,6 +21,8 @@ from ppm.components.constants import FOLDER_BROWSE_BUTTON, FOLDER_PATH
 from ppm.components.file_viewer import FileViewerComponent
 from ppm.components.main_window import MainWindowComponent
 from PySide6 import QtCore, QtWidgets
+
+logger = logging.getLogger(__name__)
 
 
 class FileBrowserComponent(AbstractComponent):
@@ -48,6 +51,7 @@ class FileBrowserComponent(AbstractComponent):
     def setup_signals(self):
         super().setup_signals()
 
+        logger.debug("Setting browse button click signals")
         self.browse_button.clicked.connect(self.browse_files)
 
     def _find_widgets(self):
@@ -57,18 +61,28 @@ class FileBrowserComponent(AbstractComponent):
         for lab in labels:
             if lab.objectName() == FOLDER_PATH:
                 self.folder_path_label = lab
+                logger.debug(
+                    f"Successfully found a widget for the key '{FOLDER_PATH}'")
 
         buttons: List[QtWidgets.QPushButton] = \
             self.main_window.ui_component.findChildren(QtWidgets.QPushButton)
         for bt in buttons:
             if bt.objectName() == FOLDER_BROWSE_BUTTON:
                 self.browse_button = bt
+                logger.debug(
+                    f"Successfully found a widget for \
+                    the key '{FOLDER_BROWSE_BUTTON}'")
 
     def set_path_label(self):
+        logger.debug(
+            f"Setting the folder_path_label value to be '{self._path}'")
         self.folder_path_label.setText(self._path)
 
     @QtCore.Slot()
     def browse_files(self):
+        logger.debug(
+            f"Spawning QFileDialog starting at the path '{self._path}'")
+
         dlg = QtWidgets.QFileDialog()
         dlg.setFileMode(QtWidgets.QFileDialog.Directory)
         dlg.setViewMode(QtWidgets.QFileDialog.List)
@@ -82,5 +96,7 @@ class FileBrowserComponent(AbstractComponent):
 
         self._path = filenames[0]
         self.set_path_label()
+
+        logger.debug(f"File dialog opened to path '{self._path}'")
 
         self.file_viewer.populate_thumbnails(self._path)
