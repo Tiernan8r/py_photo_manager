@@ -47,7 +47,8 @@ class FileViewerComponent(AbstractComponent):
         for sa in scroll_areas:
             if sa.objectName() == IMAGE_THUMBNAIL_VIEW:
                 self.image_thumbnails = sa
-                logger.debug(f"Found widget for the key '{IMAGE_THUMBNAIL_VIEW}'")
+                logger.debug(
+                    f"Found widget for the key '{IMAGE_THUMBNAIL_VIEW}'")
 
     def _supported_image_formats(self) -> List[str]:
         return [img.toStdString() for img in

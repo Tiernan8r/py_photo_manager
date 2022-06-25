@@ -61,22 +61,27 @@ class FileBrowserComponent(AbstractComponent):
         for lab in labels:
             if lab.objectName() == FOLDER_PATH:
                 self.folder_path_label = lab
-                logger.debug(f"Successfully found a widget for the key '{FOLDER_PATH}'")
+                logger.debug(
+                    f"Successfully found a widget for the key '{FOLDER_PATH}'")
 
         buttons: List[QtWidgets.QPushButton] = \
             self.main_window.ui_component.findChildren(QtWidgets.QPushButton)
         for bt in buttons:
             if bt.objectName() == FOLDER_BROWSE_BUTTON:
                 self.browse_button = bt
-                logger.debug(f"Successfully found a widget for the key '{FOLDER_BROWSE_BUTTON}'")
+                logger.debug(
+                    f"Successfully found a widget for \
+                    the key '{FOLDER_BROWSE_BUTTON}'")
 
     def set_path_label(self):
-        logger.debug(f"Setting the folder_path_label value to be '{self._path}'")
+        logger.debug(
+            f"Setting the folder_path_label value to be '{self._path}'")
         self.folder_path_label.setText(self._path)
 
     @QtCore.Slot()
     def browse_files(self):
-        logger.debug(f"Spawning QFileDialog starting at the path '{self._path}'")
+        logger.debug(
+            f"Spawning QFileDialog starting at the path '{self._path}'")
 
         dlg = QtWidgets.QFileDialog()
         dlg.setFileMode(QtWidgets.QFileDialog.Directory)
