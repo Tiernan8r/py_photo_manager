@@ -30,6 +30,10 @@ class MainWindowComponent(QMainWindow):
         """
         super().__init__(*args, **kwargs)
 
+    @property
+    def ui_component(self) -> QMainWindow:
+        raise NotImplementedError()
+
     def show(self):
         """
         Shows the loaded UI if hidden.
