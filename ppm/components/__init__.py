@@ -16,5 +16,5 @@ from ppm.components.abstract_component import \
     AbstractComponent  # noqa: F401, E501
 from ppm.components.file_browser import \
     FileBrowserComponent  # noqa: F401, E501
-from ppm.components.file_viewer import FileViewerComponent  # noqa: F401, E501
+from ppm.components.thumbnail_viewer import FileViewerComponent  # noqa: F401, E501
 from ppm.components.main_window import MainWindowComponent  # noqa: F401, E501
