@@ -16,9 +16,9 @@ import logging
 import os
 import sys
 
+from PySide6 import QtWidgets
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QWidget
 
 import ppm.components as comp
 from ppm.constants import UI_FILENAME
@@ -43,7 +43,7 @@ class MainWindow(comp.MainWindowComponent):
 
         logger.debug("Loading UI file")
 
-        self.ui_component = self.load_ui()
+        self._ui_component = self.load_ui()
         self.ui_component.setWindowTitle("Photo Manager")
 
         logger.debug("Initialising window components")
@@ -51,13 +51,17 @@ class MainWindow(comp.MainWindowComponent):
         self.file_viewer = comp.FileViewerComponent(self)
         self.file_browser = comp.FileBrowserComponent(self, self.file_viewer)
 
+    @property
+    def ui_component(self) -> QtWidgets.QMainWindow:
+        return self._ui_component
+
     def show(self):
         """
         Shows the loaded UI if hidden.
         """
         self.ui_component.show()
 
-    def load_ui(self) -> QWidget:
+    def load_ui(self) -> QtWidgets.QWidget:
         """
         Reads the UI XML file and converts it into a QT widget,
         and returns the widget
