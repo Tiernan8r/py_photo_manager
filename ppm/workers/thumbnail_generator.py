@@ -23,16 +23,22 @@ class ThumbnailGeneratorWorker(QtCore.QRunnable):
 
     def __init__(self, file_path: str):
         super().__init__()
-        self._file_path = file_path
+        self._path = file_path
 
         self.output = ThumbnailSignal()
 
     @QtCore.Slot()
     def run(self):
-        pixmap = QtGui.QPixmap(self._file_path)
+        pixmap = self._gen_pixmap()
+
+        self.output.result.emit((pixmap))
+
+    def _gen_pixmap(self) -> QtGui.QPixmap:
+        pixmap = QtGui.QPixmap(self._path)
         pixmap = pixmap.scaled(
             QtCore.QSize(100, 100),
             QtCore.Qt.KeepAspectRatio,
             QtCore.Qt.SmoothTransformation)
 
-        self.output.result.emit((pixmap))
+        return pixmap
+
