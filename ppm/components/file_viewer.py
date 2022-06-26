@@ -62,21 +62,14 @@ class FileViewerComponent(AbstractComponent):
         return [img.toStdString() for img in
                 QtGui.QImageReader.supportedImageFormats()]
 
-    def populate_thumbnails(self, dir: str):
-        logger.debug(f"Populating image thumbnails in directory '{dir}'")
+    def get_image_files(self, dir: str) -> List[str]:
+        # TODO: include subdirs...
         img_exts = self._supported_image_formats()
-
-        self.grid_layout = QtWidgets.QGridLayout(self.image_thumbnail_contents)
-        self.grid_layout.setVerticalSpacing(30)
-
-        row_in_grid_layout = 0
-        # first_img_file_path = ""
-
+        
+        files = []
         for file in os.scandir(dir):
-            # TODO: Show subdirs
             if not file.is_file():
                 continue
-
             full_path = file.path
             # Get the file extension, then drop the "." at the start
             ext = os.path.splitext(file.name)[-1][1:]
@@ -86,23 +79,39 @@ class FileViewerComponent(AbstractComponent):
                 logger.debug("File isn't an image file, skipping")
                 continue
 
+            files.append(full_path)
+
+        return files
+
+    def populate_thumbnails(self, dir: str):
+        logger.debug(f"Populating image thumbnails in directory '{dir}'")
+
+        self.grid_layout = QtWidgets.QGridLayout(self.image_thumbnail_contents)
+        self.grid_layout.setVerticalSpacing(30)
+
+        row_in_grid_layout = 0
+        # first_img_file_path = ""
+
+        for file in self.get_image_files(dir):
+            file_name = os.path.basename(file)
+
             img_label = QtWidgets.QLabel()
             img_label.setAlignment(QtCore.Qt.AlignCenter)
 
             text_label = QtWidgets.QLabel()
             text_label.setAlignment(QtCore.Qt.AlignCenter)
 
-            pixmap = QtGui.QPixmap(full_path)
+            pixmap = QtGui.QPixmap(file)
             pixmap = pixmap.scaled(
                 QtCore.QSize(100, 100),
                 QtCore.Qt.KeepAspectRatio,
                 QtCore.Qt.SmoothTransformation)
             img_label.setPixmap(pixmap)
-            text_label.setText(file.name)
+            text_label.setText(file_name)
 
             def custom_mouse_press(event,
                                    index=row_in_grid_layout,
-                                   file_path=full_path):
+                                   file_path=file):
                 self.on_thumbnail_click(event, index, file_path)
 
             img_label.mousePressEvent = custom_mouse_press  # type: ignore
