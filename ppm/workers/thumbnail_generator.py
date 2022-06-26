@@ -18,7 +18,7 @@ from ppm.workers.constants import THUMBNAIL_PIXEL_HEIGHT, THUMBNAIL_PIXEL_WIDTH
 from PySide6 import QtCore, QtGui, QtWidgets
 
 
-class ThumbnailSignal(QtCore.QObject):
+class _ThumbnailSignal(QtCore.QObject):
     result = QtCore.Signal(tuple)
 
 
@@ -28,7 +28,7 @@ class ThumbnailGeneratorWorker(QtCore.QRunnable):
         super().__init__()
         self._path = file_path
 
-        self.output = ThumbnailSignal()
+        self.output = _ThumbnailSignal()
 
     @QtCore.Slot()
     def run(self):
