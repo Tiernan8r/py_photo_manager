@@ -18,7 +18,7 @@ import sys
 
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QMainWindow, QWidget
 
 import ppm.components as comp
 from ppm.constants import UI_FILENAME
@@ -43,13 +43,17 @@ class MainWindow(comp.MainWindowComponent):
 
         logger.debug("Loading UI file")
 
-        self.ui_component = self.load_ui()
+        self._ui_component = self.load_ui()
         self.ui_component.setWindowTitle("Photo Manager")
 
         logger.debug("Initialising window components")
 
         self.file_viewer = comp.FileViewerComponent(self)
         self.file_browser = comp.FileBrowserComponent(self, self.file_viewer)
+
+    @property
+    def ui_component(self) -> QMainWindow:
+        return self._ui_component
 
     def show(self):
         """

@@ -46,3 +46,7 @@ class MainWindowComponent(QMainWindow):
             elements laid out as defined in the UI file.
         """
         raise NotImplementedError()
+
+    @property
+    def ui_component(self) -> QMainWindow:
+        raise NotImplementedError()

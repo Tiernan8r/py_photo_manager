@@ -17,7 +17,7 @@ import os
 from typing import List
 
 from ppm.components import AbstractComponent
-from ppm.components.constants import IMAGE_THUMBNAIL_VIEW
+from ppm.components.constants import IMAGE_THUMBNAIL_CONTENTS, IMAGE_THUMBNAIL_VIEW
 from ppm.components.main_window import MainWindowComponent
 from PySide6 import QtCore, QtGui, QtWidgets
 
@@ -50,6 +50,14 @@ class FileViewerComponent(AbstractComponent):
                 logger.debug(
                     f"Found widget for the key '{IMAGE_THUMBNAIL_VIEW}'")
 
+        widgets: List[QtWidgets.QWidget] = self.main_window.ui_component.findChildren(
+            QtWidgets.QWidget)
+        for wdgt in widgets:
+            if wdgt.objectName() == IMAGE_THUMBNAIL_CONTENTS:
+                self.image_thumbnail_contents = wdgt
+                logger.debug(
+                    f"Found widget for the key '{IMAGE_THUMBNAIL_CONTENTS}'")
+
     def _supported_image_formats(self) -> List[str]:
         return [img.toStdString() for img in
                 QtGui.QImageReader.supportedImageFormats()]
@@ -58,7 +66,7 @@ class FileViewerComponent(AbstractComponent):
         logger.debug(f"Populating image thumbnails in directory '{dir}'")
         img_exts = self._supported_image_formats()
 
-        self.grid_layout = QtWidgets.QGridLayout(self.image_thumbnails)
+        self.grid_layout = QtWidgets.QGridLayout(self.image_thumbnail_contents)
         self.grid_layout.setVerticalSpacing(30)
 
         row_in_grid_layout = 0
