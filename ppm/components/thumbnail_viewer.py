@@ -124,7 +124,7 @@ class ThumbnailViewerComponent(AbstractComponent):
             text_label = QtWidgets.QLabel()
             text_label.setAlignment(QtCore.Qt.AlignCenter)
 
-            img_label.setPixmap(pixmap) # type: ignore
+            img_label.setPixmap(pixmap)  # type: ignore
             text_label.setText(file_name)
 
             img_label.mousePressEvent = mouse_click_event  # type: ignore
