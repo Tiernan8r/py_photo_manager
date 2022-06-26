@@ -91,7 +91,6 @@ class FileViewerComponent(AbstractComponent):
         self.grid_layout.setVerticalSpacing(30)
 
         row_in_grid_layout = 0
-        # first_img_file_path = ""
 
         for file in self.get_image_files(dir):
 
@@ -105,12 +104,8 @@ class FileViewerComponent(AbstractComponent):
             self.grid_layout.addLayout(
                 thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
 
-            # if row_in_grid_layout == 0:
-            #     first_img_file_path = full_path
             row_in_grid_layout += 1
 
-        # Automatically select the first file in the list during init
-        # self.on_thumbnail_click(None, 0, first_img_file_path)
         logger.debug(f"DONE populating {row_in_grid_layout + 1} thumbnails")
 
     def _create_thumbnail(self, file_path: str, mouse_click_event: typing.Callable):
