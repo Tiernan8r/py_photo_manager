@@ -81,7 +81,7 @@ class FileViewerComponent(AbstractComponent):
 
             files.append(full_path)
 
-        return files
+        return sorted(files)
 
     def populate_thumbnails(self, dir: str):
         logger.debug(f"Populating image thumbnails in directory '{dir}'")
