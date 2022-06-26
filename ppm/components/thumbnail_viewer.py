@@ -102,13 +102,8 @@ class ThumbnailViewerComponent(AbstractComponent):
                                    file_path=file):
                 self.on_thumbnail_click(event, index, file_path)
 
-            # thumbnail = self._create_thumbnail(file, custom_mouse_press)
             self._create_thumbnail(
                 file, custom_mouse_press, row_in_grid_layout, self.grid_layout)
-
-            # self.grid_layout.addLayout(
-            #     thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
-            # self.grid_layout.addLayout(thumbnail)
 
             row_in_grid_layout += 1
 
@@ -163,6 +158,3 @@ class ThumbnailViewerComponent(AbstractComponent):
         text_label_of_thumbnail = self.grid_layout.itemAtPosition(index, 0)\
             .itemAt(1).widget()
         text_label_of_thumbnail.setStyleSheet("background-color:blue;")
-
-        # Update the display's image
-        # self.display_image.update_display_image(img_file_path)
