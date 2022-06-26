@@ -25,7 +25,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 logger = logging.getLogger(__name__)
 
 
-class FileViewerComponent(AbstractComponent):
+class ThumbnailViewerComponent(AbstractComponent):
 
     def __init__(self, main_window: MainWindowComponent,
                  *args, **kwargs):
