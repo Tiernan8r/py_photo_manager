@@ -16,9 +16,7 @@ import logging
 import os
 import sys
 
-from PySide6 import QtWidgets
-from PySide6.QtCore import QFile, QIODevice
-from PySide6.QtUiTools import QUiLoader
+from PySide6 import QtCore, QtUiTools, QtWidgets
 
 import ppm.components as comp
 from ppm.constants import UI_FILENAME
@@ -72,15 +70,15 @@ class MainWindow(comp.MainWindowComponent):
         """
         # Load in the 'form.ui' file where the ui layout is defined
         path = os.path.join(os.path.dirname(__file__), UI_FILENAME)
-        ui_file = QFile(path)
+        ui_file = QtCore.QFile(path)
 
-        if not ui_file.open(QIODevice.ReadOnly):
+        if not ui_file.open(QtCore.QIODevice.ReadOnly):
             logger.error(f"Cannot open {UI_FILENAME}: {ui_file.errorString()}")
             sys.exit(-1)
 
         # Load the file using the QT UI loader class and return the
         # ui widget representing the layout
-        loader = QUiLoader()
+        loader = QtUiTools.QUiLoader()
         ui_window = loader.load(ui_file)
         ui_file.close()
         if not ui_window:
