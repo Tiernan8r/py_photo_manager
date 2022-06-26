@@ -91,7 +91,6 @@ class ThumbnailViewerComponent(AbstractComponent):
         logger.debug(f"Populating image thumbnails in directory '{dir}'")
 
         self.grid_layout = QtWidgets.QGridLayout(self.image_thumbnail_contents)
-        self.grid_layout.setVerticalSpacing(30)
 
         row_in_grid_layout = 0
 
