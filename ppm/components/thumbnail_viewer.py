@@ -14,11 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 import os
-from typing import List
 import typing
+from typing import List
 
 from ppm.components import AbstractComponent
-from ppm.components.constants import IMAGE_THUMBNAIL_CONTENTS, IMAGE_THUMBNAIL_VIEW
+from ppm.components.constants import (IMAGE_THUMBNAIL_CONTENTS,
+                                      IMAGE_THUMBNAIL_VIEW)
 from ppm.components.main_window import MainWindowComponent
 from PySide6 import QtCore, QtGui, QtWidgets
 
@@ -40,6 +41,7 @@ class ThumbnailViewerComponent(AbstractComponent):
         :param **kwargs: dictionary parameters to pass to QtCore.QObject
         """
         super().__init__(main_window, *args, **kwargs)
+        self._thumbnail_generator_pool = QtCore.QThreadPool()
 
     def _find_widgets(self):
         scroll_areas: List[QtWidgets.QScrollArea] = \
@@ -99,41 +101,53 @@ class ThumbnailViewerComponent(AbstractComponent):
                                    file_path=file):
                 self.on_thumbnail_click(event, index, file_path)
 
-            thumbnail = self._create_thumbnail(file, custom_mouse_press)
+            # thumbnail = self._create_thumbnail(file, custom_mouse_press)
+            self._create_thumbnail(
+                file, custom_mouse_press, row_in_grid_layout, self.grid_layout)
 
-            self.grid_layout.addLayout(
-                thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
+            # self.grid_layout.addLayout(
+            #     thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
+            # self.grid_layout.addLayout(thumbnail)
 
             row_in_grid_layout += 1
 
         logger.debug(f"DONE populating {row_in_grid_layout + 1} thumbnails")
 
-    def _create_thumbnail(self, file_path: str, mouse_click_event: typing.Callable):
-        file_name = os.path.basename(file_path)
+    def _allocate_thumbnail(self, file_path: str, mouse_click_event: typing.Callable, row_in_grid_layout: int, grid_layout: QtWidgets.QGridLayout):
 
-        img_label = QtWidgets.QLabel()
-        img_label.setAlignment(QtCore.Qt.AlignCenter)
+        @QtCore.Slot(tuple)
+        def nested(pixmap: tuple):
+            file_name = os.path.basename(file_path)
 
-        text_label = QtWidgets.QLabel()
-        text_label.setAlignment(QtCore.Qt.AlignCenter)
+            img_label = QtWidgets.QLabel()
+            img_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        pixmap = QtGui.QPixmap(file_path)
-        pixmap = pixmap.scaled(
-            QtCore.QSize(100, 100),
-            QtCore.Qt.KeepAspectRatio,
-            QtCore.Qt.SmoothTransformation)
-        img_label.setPixmap(pixmap)
-        text_label.setText(file_name)
+            text_label = QtWidgets.QLabel()
+            text_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        img_label.mousePressEvent = mouse_click_event  # type: ignore
-        text_label.mousePressEvent = mouse_click_event  # type: ignore
+            img_label.setPixmap(pixmap)
+            text_label.setText(file_name)
 
-        thumbnail = QtWidgets.QBoxLayout(
-            QtWidgets.QBoxLayout.TopToBottom)
-        thumbnail.addWidget(img_label)
-        thumbnail.addWidget(text_label)
+            img_label.mousePressEvent = mouse_click_event  # type: ignore
+            text_label.mousePressEvent = mouse_click_event  # type: ignore
 
-        return thumbnail
+            thumbnail = QtWidgets.QBoxLayout(
+                QtWidgets.QBoxLayout.TopToBottom)
+            thumbnail.addWidget(img_label)
+            thumbnail.addWidget(text_label)
+
+            grid_layout.addLayout(
+                thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
+
+        return nested
+
+    def _create_thumbnail(self, file_path: str, mouse_click_event: typing.Callable, row_in_grid_layout: int, grid_layout: QtWidgets.QGridLayout) -> QtWidgets.QBoxLayout:
+        thumbnail_generator = ThumbnailGeneratorWorker(file_path)
+
+        thumbnail_generator.output.result.connect(self._allocate_thumbnail(
+            file_path, mouse_click_event, row_in_grid_layout, grid_layout))
+
+        self._thumbnail_generator_pool.start(thumbnail_generator)
 
     def on_thumbnail_click(self, event, index, img_file_path):
         logger.debug(f"Image '{img_file_path}' has been clicked")
@@ -151,3 +165,26 @@ class ThumbnailViewerComponent(AbstractComponent):
 
         # Update the display's image
         # self.display_image.update_display_image(img_file_path)
+
+
+class ThumbnailSignal(QtCore.QObject):
+    result = QtCore.Signal(tuple)
+
+
+class ThumbnailGeneratorWorker(QtCore.QRunnable):
+
+    def __init__(self, file_path: str):
+        super().__init__()
+        self._file_path = file_path
+
+        self.output = ThumbnailSignal()
+
+    @QtCore.Slot()
+    def run(self):
+        pixmap = QtGui.QPixmap(self._file_path)
+        pixmap = pixmap.scaled(
+            QtCore.QSize(100, 100),
+            QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation)
+
+        self.output.result.emit((pixmap))
