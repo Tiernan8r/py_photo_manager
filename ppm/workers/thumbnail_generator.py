@@ -12,7 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PySide6 import QtCore, QtGui
+import os
+from PySide6 import QtCore, QtGui, QtWidgets
 
 
 class ThumbnailSignal(QtCore.QObject):
@@ -33,6 +34,10 @@ class ThumbnailGeneratorWorker(QtCore.QRunnable):
 
         self.output.result.emit((pixmap))
 
+    @property
+    def file_name(self) -> str:
+        return os.path.basename(self._path)
+
     def _gen_pixmap(self) -> QtGui.QPixmap:
         pixmap = QtGui.QPixmap(self._path)
         pixmap = pixmap.scaled(
@@ -42,3 +47,23 @@ class ThumbnailGeneratorWorker(QtCore.QRunnable):
 
         return pixmap
 
+    def _gen_thumbnail(self) -> QtWidgets.QBoxLayout:
+        img_label = QtWidgets.QLabel()
+        img_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        text_label = QtWidgets.QLabel()
+        text_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        pixmap = self._gen_pixmap()
+        img_label.setPixmap(pixmap)
+        text_label.setText(self.file_name)
+
+        img_label.mousePressEvent = mouse_click_event  # type: ignore
+        text_label.mousePressEvent = mouse_click_event  # type: ignore
+
+        thumbnail = QtWidgets.QBoxLayout(
+            QtWidgets.QBoxLayout.TopToBottom)
+        thumbnail.addWidget(img_label)
+        thumbnail.addWidget(text_label)
+
+        return thumbnail
