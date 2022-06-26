@@ -21,8 +21,8 @@ from ppm.components import AbstractComponent
 from ppm.components.constants import (IMAGE_THUMBNAIL_CONTENTS,
                                       IMAGE_THUMBNAIL_VIEW)
 from ppm.components.main_window import MainWindowComponent
-from PySide6 import QtCore, QtGui, QtWidgets
 from ppm.workers import ThumbnailGeneratorWorker
+from PySide6 import QtCore, QtGui, QtWidgets
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +54,8 @@ class ThumbnailViewerComponent(AbstractComponent):
                 logger.debug(
                     f"Found widget for the key '{IMAGE_THUMBNAIL_VIEW}'")
 
-        widgets: List[QtWidgets.QWidget] = self.main_window.ui_component.findChildren(
-            QtWidgets.QWidget)
+        widgets: List[QtWidgets.QWidget] = \
+            self.main_window.ui_component.findChildren(QtWidgets.QWidget)
         for wdgt in widgets:
             if wdgt.objectName() == IMAGE_THUMBNAIL_CONTENTS:
                 self.image_thumbnail_contents = wdgt
@@ -109,10 +109,16 @@ class ThumbnailViewerComponent(AbstractComponent):
 
         logger.debug(f"DONE populating {row_in_grid_layout + 1} thumbnails")
 
-    def _allocate_thumbnail(self, file_path: str, mouse_click_event: typing.Callable, row_in_grid_layout: int, grid_layout: QtWidgets.QGridLayout):
+    def _allocate_thumbnail(self,
+                            file_path: str,
+                            mouse_click_event: typing.Callable,
+                            row_in_grid_layout: int,
+                            grid_layout: QtWidgets.QGridLayout):
 
         @QtCore.Slot(tuple)
-        def nested(pixmap: tuple):
+        def nested(pixmap_t: tuple):
+            pixmap = pixmap_t[0]
+
             file_name = os.path.basename(file_path)
 
             img_label = QtWidgets.QLabel()
@@ -137,7 +143,11 @@ class ThumbnailViewerComponent(AbstractComponent):
 
         return nested
 
-    def _create_thumbnail(self, file_path: str, mouse_click_event: typing.Callable, row_in_grid_layout: int, grid_layout: QtWidgets.QGridLayout) -> QtWidgets.QBoxLayout:
+    def _create_thumbnail(self,
+                          file_path: str,
+                          mouse_click_event: typing.Callable,
+                          row_in_grid_layout: int,
+                          grid_layout: QtWidgets.QGridLayout):
         thumbnail_generator = ThumbnailGeneratorWorker(file_path)
 
         thumbnail_generator.output.result.connect(self._allocate_thumbnail(

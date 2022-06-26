@@ -49,7 +49,8 @@ class MainWindow(comp.MainWindowComponent):
         logger.debug("Initialising window components")
 
         self.thumbnail_viewer = comp.ThumbnailViewerComponent(self)
-        self.file_browser = comp.FileBrowserComponent(self, self.thumbnail_viewer)
+        self.file_browser = comp.FileBrowserComponent(
+            self, self.thumbnail_viewer)
 
     @property
     def ui_component(self) -> QMainWindow:
