@@ -163,3 +163,4 @@ docs/report/*.pdf
 
 # Ignore QTCreator project files:
 *.pyproject.user
+.qt_for_python/

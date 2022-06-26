@@ -12,9 +12,27 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from ppm.components.abstract_component import \
-    AbstractComponent  # noqa: F401, E501
-from ppm.components.file_browser import \
-    FileBrowserComponent  # noqa: F401, E501
-from ppm.components.thumbnail_viewer import ThumbnailViewerComponent  # noqa: F401, E501
-from ppm.components.main_window import MainWindowComponent  # noqa: F401, E501
+from PySide6 import QtCore, QtGui
+
+
+class ThumbnailSignal(QtCore.QObject):
+    result = QtCore.Signal(tuple)
+
+
+class ThumbnailGeneratorWorker(QtCore.QRunnable):
+
+    def __init__(self, file_path: str):
+        super().__init__()
+        self._file_path = file_path
+
+        self.output = ThumbnailSignal()
+
+    @QtCore.Slot()
+    def run(self):
+        pixmap = QtGui.QPixmap(self._file_path)
+        pixmap = pixmap.scaled(
+            QtCore.QSize(100, 100),
+            QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation)
+
+        self.output.result.emit((pixmap))

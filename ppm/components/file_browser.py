@@ -18,7 +18,7 @@ from typing import List
 
 from ppm.components import AbstractComponent
 from ppm.components.constants import FOLDER_BROWSE_BUTTON, FOLDER_PATH
-from ppm.components.file_viewer import FileViewerComponent
+from ppm.components.thumbnail_viewer import ThumbnailViewerComponent
 from ppm.components.main_window import MainWindowComponent
 from PySide6 import QtCore, QtWidgets
 
@@ -30,7 +30,7 @@ class FileBrowserComponent(AbstractComponent):
     _path = os.path.expanduser("~")
 
     def __init__(self, main_window: MainWindowComponent,
-                 file_viewer: FileViewerComponent,
+                 thumbnail_viewer: ThumbnailViewerComponent,
                  * args, **kwargs):
         """
         Initialise the FileBrowserComponent object, referencing the main window
@@ -42,7 +42,7 @@ class FileBrowserComponent(AbstractComponent):
             to QtCore.QObject
         :param **kwargs: dictionary parameters to pass to QtCore.QObject
         """
-        self.file_viewer = file_viewer
+        self.thumbnail_viewer = thumbnail_viewer
         super().__init__(main_window, *args, **kwargs)
 
         # Set the path label to the default initially
@@ -99,4 +99,4 @@ class FileBrowserComponent(AbstractComponent):
 
         logger.debug(f"File dialog opened to path '{self._path}'")
 
-        self.file_viewer.populate_thumbnails(self._path)
+        self.thumbnail_viewer.populate_thumbnails(self._path)

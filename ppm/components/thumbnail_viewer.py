@@ -14,17 +14,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 import os
+import typing
 from typing import List
 
 from ppm.components import AbstractComponent
-from ppm.components.constants import IMAGE_THUMBNAIL_VIEW
+from ppm.components.constants import (IMAGE_THUMBNAIL_CONTENTS,
+                                      IMAGE_THUMBNAIL_VIEW)
 from ppm.components.main_window import MainWindowComponent
+from ppm.workers import ThumbnailGeneratorWorker
 from PySide6 import QtCore, QtGui, QtWidgets
 
 logger = logging.getLogger(__name__)
 
 
-class FileViewerComponent(AbstractComponent):
+class ThumbnailViewerComponent(AbstractComponent):
 
     def __init__(self, main_window: MainWindowComponent,
                  *args, **kwargs):
@@ -39,6 +42,7 @@ class FileViewerComponent(AbstractComponent):
         :param **kwargs: dictionary parameters to pass to QtCore.QObject
         """
         super().__init__(main_window, *args, **kwargs)
+        self._thumbnail_generator_pool = QtCore.QThreadPool()
 
     def _find_widgets(self):
         scroll_areas: List[QtWidgets.QScrollArea] = \
@@ -50,25 +54,26 @@ class FileViewerComponent(AbstractComponent):
                 logger.debug(
                     f"Found widget for the key '{IMAGE_THUMBNAIL_VIEW}'")
 
+        widgets: List[QtWidgets.QWidget] = \
+            self.main_window.ui_component.findChildren(QtWidgets.QWidget)
+        for wdgt in widgets:
+            if wdgt.objectName() == IMAGE_THUMBNAIL_CONTENTS:
+                self.image_thumbnail_contents = wdgt
+                logger.debug(
+                    f"Found widget for the key '{IMAGE_THUMBNAIL_CONTENTS}'")
+
     def _supported_image_formats(self) -> List[str]:
         return [img.toStdString() for img in
                 QtGui.QImageReader.supportedImageFormats()]
 
-    def populate_thumbnails(self, dir: str):
-        logger.debug(f"Populating image thumbnails in directory '{dir}'")
+    def get_image_files(self, dir: str) -> List[str]:
+        # TODO: include subdirs...
         img_exts = self._supported_image_formats()
 
-        self.grid_layout = QtWidgets.QGridLayout(self.image_thumbnails)
-        self.grid_layout.setVerticalSpacing(30)
-
-        row_in_grid_layout = 0
-        # first_img_file_path = ""
-
+        files = []
         for file in os.scandir(dir):
-            # TODO: Show subdirs
             if not file.is_file():
                 continue
-
             full_path = file.path
             # Get the file extension, then drop the "." at the start
             ext = os.path.splitext(file.name)[-1][1:]
@@ -78,43 +83,74 @@ class FileViewerComponent(AbstractComponent):
                 logger.debug("File isn't an image file, skipping")
                 continue
 
+            files.append(full_path)
+
+        return sorted(files)
+
+    def populate_thumbnails(self, dir: str):
+        logger.debug(f"Populating image thumbnails in directory '{dir}'")
+
+        self.grid_layout = QtWidgets.QGridLayout(self.image_thumbnail_contents)
+
+        row_in_grid_layout = 0
+
+        for file in self.get_image_files(dir):
+
+            def custom_mouse_press(event,
+                                   index=row_in_grid_layout,
+                                   file_path=file):
+                self.on_thumbnail_click(event, index, file_path)
+
+            self._create_thumbnail(
+                file, custom_mouse_press, row_in_grid_layout, self.grid_layout)
+
+            row_in_grid_layout += 1
+
+        logger.debug(f"DONE populating {row_in_grid_layout + 1} thumbnails")
+
+    def _allocate_thumbnail(self,
+                            file_path: str,
+                            mouse_click_event: typing.Callable,
+                            row_in_grid_layout: int,
+                            grid_layout: QtWidgets.QGridLayout):
+
+        @QtCore.Slot(tuple)
+        def nested(pixmap: tuple):
+            file_name = os.path.basename(file_path)
+
             img_label = QtWidgets.QLabel()
             img_label.setAlignment(QtCore.Qt.AlignCenter)
 
             text_label = QtWidgets.QLabel()
             text_label.setAlignment(QtCore.Qt.AlignCenter)
 
-            pixmap = QtGui.QPixmap(full_path)
-            pixmap = pixmap.scaled(
-                QtCore.QSize(100, 100),
-                QtCore.Qt.KeepAspectRatio,
-                QtCore.Qt.SmoothTransformation)
-            img_label.setPixmap(pixmap)
-            text_label.setText(file.name)
+            img_label.setPixmap(pixmap)  # type: ignore
+            text_label.setText(file_name)
 
-            def custom_mouse_press(event,
-                                   index=row_in_grid_layout,
-                                   file_path=full_path):
-                self.on_thumbnail_click(event, index, file_path)
-
-            img_label.mousePressEvent = custom_mouse_press  # type: ignore
-            text_label.mousePressEvent = custom_mouse_press  # type: ignore
+            img_label.mousePressEvent = mouse_click_event  # type: ignore
+            text_label.mousePressEvent = mouse_click_event  # type: ignore
 
             thumbnail = QtWidgets.QBoxLayout(
                 QtWidgets.QBoxLayout.TopToBottom)
             thumbnail.addWidget(img_label)
             thumbnail.addWidget(text_label)
 
-            self.grid_layout.addLayout(
+            grid_layout.addLayout(
                 thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
 
-            # if row_in_grid_layout == 0:
-            #     first_img_file_path = full_path
-            row_in_grid_layout += 1
+        return nested
 
-        # Automatically select the first file in the list during init
-        # self.on_thumbnail_click(None, 0, first_img_file_path)
-        logger.debug(f"DONE populating {row_in_grid_layout + 1} thumbnails")
+    def _create_thumbnail(self,
+                          file_path: str,
+                          mouse_click_event: typing.Callable,
+                          row_in_grid_layout: int,
+                          grid_layout: QtWidgets.QGridLayout):
+        thumbnail_generator = ThumbnailGeneratorWorker(file_path)
+
+        thumbnail_generator.output.result.connect(self._allocate_thumbnail(
+            file_path, mouse_click_event, row_in_grid_layout, grid_layout))
+
+        self._thumbnail_generator_pool.start(thumbnail_generator)
 
     def on_thumbnail_click(self, event, index, img_file_path):
         logger.debug(f"Image '{img_file_path}' has been clicked")
@@ -129,6 +165,3 @@ class FileViewerComponent(AbstractComponent):
         text_label_of_thumbnail = self.grid_layout.itemAtPosition(index, 0)\
             .itemAt(1).widget()
         text_label_of_thumbnail.setStyleSheet("background-color:blue;")
-
-        # Update the display's image
-        # self.display_image.update_display_image(img_file_path)
