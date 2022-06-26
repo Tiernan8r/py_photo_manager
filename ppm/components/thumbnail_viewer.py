@@ -160,10 +160,10 @@ class ThumbnailViewerComponent(AbstractComponent):
             text_label = self.grid_layout.itemAtPosition(text_label_index, 0) \
                 .itemAt(1).widget()
             text_label.setStyleSheet(
-                "background-color:none; text-color: black")
+                "background-color:none; color: black")
 
         # Select the single clicked thumbnail
         text_label_of_thumbnail = self.grid_layout.itemAtPosition(index, 0)\
             .itemAt(1).widget()
         text_label_of_thumbnail.setStyleSheet(
-            "background-color:blue; text-color: white")
+            "background-color:blue; color: white")
