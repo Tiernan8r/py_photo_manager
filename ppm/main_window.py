@@ -41,13 +41,17 @@ class MainWindow(comp.MainWindowComponent):
 
         logger.debug("Loading UI file")
 
-        self.ui_component = self.load_ui()
+        self._ui_component = self.load_ui()
         self.ui_component.setWindowTitle("Photo Manager")
 
         logger.debug("Initialising window components")
 
         self.file_viewer = comp.FileViewerComponent(self)
         self.file_browser = comp.FileBrowserComponent(self, self.file_viewer)
+
+    @property
+    def ui_component(self) -> QtWidgets.QMainWindow:
+        return self._ui_component
 
     def show(self):
         """
