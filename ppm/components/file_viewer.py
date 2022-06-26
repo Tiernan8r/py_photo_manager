@@ -15,6 +15,7 @@
 import logging
 import os
 from typing import List
+import typing
 
 from ppm.components import AbstractComponent
 from ppm.components.constants import IMAGE_THUMBNAIL_CONTENTS, IMAGE_THUMBNAIL_VIEW
@@ -65,7 +66,7 @@ class FileViewerComponent(AbstractComponent):
     def get_image_files(self, dir: str) -> List[str]:
         # TODO: include subdirs...
         img_exts = self._supported_image_formats()
-        
+
         files = []
         for file in os.scandir(dir):
             if not file.is_file():
@@ -93,34 +94,13 @@ class FileViewerComponent(AbstractComponent):
         # first_img_file_path = ""
 
         for file in self.get_image_files(dir):
-            file_name = os.path.basename(file)
-
-            img_label = QtWidgets.QLabel()
-            img_label.setAlignment(QtCore.Qt.AlignCenter)
-
-            text_label = QtWidgets.QLabel()
-            text_label.setAlignment(QtCore.Qt.AlignCenter)
-
-            pixmap = QtGui.QPixmap(file)
-            pixmap = pixmap.scaled(
-                QtCore.QSize(100, 100),
-                QtCore.Qt.KeepAspectRatio,
-                QtCore.Qt.SmoothTransformation)
-            img_label.setPixmap(pixmap)
-            text_label.setText(file_name)
 
             def custom_mouse_press(event,
                                    index=row_in_grid_layout,
                                    file_path=file):
                 self.on_thumbnail_click(event, index, file_path)
 
-            img_label.mousePressEvent = custom_mouse_press  # type: ignore
-            text_label.mousePressEvent = custom_mouse_press  # type: ignore
-
-            thumbnail = QtWidgets.QBoxLayout(
-                QtWidgets.QBoxLayout.TopToBottom)
-            thumbnail.addWidget(img_label)
-            thumbnail.addWidget(text_label)
+            thumbnail = self._create_thumbnail(file, custom_mouse_press)
 
             self.grid_layout.addLayout(
                 thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
@@ -132,6 +112,33 @@ class FileViewerComponent(AbstractComponent):
         # Automatically select the first file in the list during init
         # self.on_thumbnail_click(None, 0, first_img_file_path)
         logger.debug(f"DONE populating {row_in_grid_layout + 1} thumbnails")
+
+    def _create_thumbnail(self, file_path: str, mouse_click_event: typing.Callable):
+        file_name = os.path.basename(file_path)
+
+        img_label = QtWidgets.QLabel()
+        img_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        text_label = QtWidgets.QLabel()
+        text_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        pixmap = QtGui.QPixmap(file_path)
+        pixmap = pixmap.scaled(
+            QtCore.QSize(100, 100),
+            QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation)
+        img_label.setPixmap(pixmap)
+        text_label.setText(file_name)
+
+        img_label.mousePressEvent = mouse_click_event  # type: ignore
+        text_label.mousePressEvent = mouse_click_event  # type: ignore
+
+        thumbnail = QtWidgets.QBoxLayout(
+            QtWidgets.QBoxLayout.TopToBottom)
+        thumbnail.addWidget(img_label)
+        thumbnail.addWidget(text_label)
+
+        return thumbnail
 
     def on_thumbnail_click(self, event, index, img_file_path):
         logger.debug(f"Image '{img_file_path}' has been clicked")
