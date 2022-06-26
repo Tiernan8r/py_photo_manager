@@ -18,7 +18,8 @@ import typing
 from typing import List
 
 from ppm.components import AbstractComponent
-from ppm.components.constants import (IMAGE_THUMBNAIL_CONTENTS,
+from ppm.components.constants import (FOUND_WIDGET_LOG_MESSAGE,
+                                      IMAGE_THUMBNAIL_CONTENTS,
                                       IMAGE_THUMBNAIL_VIEW)
 from ppm.components.main_window import MainWindowComponent
 from ppm.workers import ThumbnailGeneratorWorker
@@ -51,16 +52,16 @@ class ThumbnailViewerComponent(AbstractComponent):
         for sa in scroll_areas:
             if sa.objectName() == IMAGE_THUMBNAIL_VIEW:
                 self.image_thumbnails = sa
-                logger.debug(
-                    f"Found widget for the key '{IMAGE_THUMBNAIL_VIEW}'")
+                logger.debug(FOUND_WIDGET_LOG_MESSAGE.format(
+                    IMAGE_THUMBNAIL_VIEW))
 
         widgets: List[QtWidgets.QWidget] = \
             self.main_window.ui_component.findChildren(QtWidgets.QWidget)
         for wdgt in widgets:
             if wdgt.objectName() == IMAGE_THUMBNAIL_CONTENTS:
                 self.image_thumbnail_contents = wdgt
-                logger.debug(
-                    f"Found widget for the key '{IMAGE_THUMBNAIL_CONTENTS}'")
+                logger.debug(FOUND_WIDGET_LOG_MESSAGE.format(
+                    IMAGE_THUMBNAIL_CONTENTS))
 
     def _supported_image_formats(self) -> List[str]:
         return [img.toStdString() for img in

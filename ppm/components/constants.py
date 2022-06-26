@@ -17,3 +17,5 @@ FOLDER_BROWSE_BUTTON = "browse_folder_location"
 
 IMAGE_THUMBNAIL_VIEW = "image_thumbnails"
 IMAGE_THUMBNAIL_CONTENTS = "image_thumbnails_contents"
+
+FOUND_WIDGET_LOG_MESSAGE = "Successfully found a widget for the key '{0}'"
