@@ -42,7 +42,7 @@ class ThumbnailViewerComponent(AbstractComponent):
         :param **kwargs: dictionary parameters to pass to QtCore.QObject
         """
         super().__init__(main_window, *args, **kwargs)
-        self._thumbnail_generator_pool = QtCore.QThreadPool()
+        self._thread_pool = QtCore.QThreadPool()
 
     def _find_widgets(self):
         scroll_areas: List[QtWidgets.QScrollArea] = \
@@ -150,7 +150,7 @@ class ThumbnailViewerComponent(AbstractComponent):
         thumbnail_generator.output.result.connect(self._allocate_thumbnail(
             file_path, mouse_click_event, row_in_grid_layout, grid_layout))
 
-        self._thumbnail_generator_pool.start(thumbnail_generator)
+        self._thread_pool.start(thumbnail_generator)
 
     def on_thumbnail_click(self, event, index, img_file_path):
         logger.debug(f"Image '{img_file_path}' has been clicked")
