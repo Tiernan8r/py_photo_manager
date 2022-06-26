@@ -116,9 +116,7 @@ class ThumbnailViewerComponent(AbstractComponent):
                             grid_layout: QtWidgets.QGridLayout):
 
         @QtCore.Slot(tuple)
-        def nested(pixmap_t: tuple):
-            pixmap = pixmap_t[0]
-
+        def nested(pixmap: tuple):
             file_name = os.path.basename(file_path)
 
             img_label = QtWidgets.QLabel()
@@ -127,7 +125,7 @@ class ThumbnailViewerComponent(AbstractComponent):
             text_label = QtWidgets.QLabel()
             text_label.setAlignment(QtCore.Qt.AlignCenter)
 
-            img_label.setPixmap(pixmap)
+            img_label.setPixmap(pixmap) # type: ignore
             text_label.setText(file_name)
 
             img_label.mousePressEvent = mouse_click_event  # type: ignore
