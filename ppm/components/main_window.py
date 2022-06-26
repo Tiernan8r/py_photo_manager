@@ -31,7 +31,7 @@ class MainWindowComponent(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
 
     @property
-    def ui_component(self) -> QMainWindow:
+    def ui_component(self) -> QtWidgets.QMainWindow:
         raise NotImplementedError()
 
     def show(self):
