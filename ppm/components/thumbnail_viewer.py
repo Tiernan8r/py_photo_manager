@@ -22,6 +22,7 @@ from ppm.components.constants import (IMAGE_THUMBNAIL_CONTENTS,
                                       IMAGE_THUMBNAIL_VIEW)
 from ppm.components.main_window import MainWindowComponent
 from PySide6 import QtCore, QtGui, QtWidgets
+from ppm.workers import ThumbnailGeneratorWorker
 
 logger = logging.getLogger(__name__)
 
@@ -165,26 +166,3 @@ class ThumbnailViewerComponent(AbstractComponent):
 
         # Update the display's image
         # self.display_image.update_display_image(img_file_path)
-
-
-class ThumbnailSignal(QtCore.QObject):
-    result = QtCore.Signal(tuple)
-
-
-class ThumbnailGeneratorWorker(QtCore.QRunnable):
-
-    def __init__(self, file_path: str):
-        super().__init__()
-        self._file_path = file_path
-
-        self.output = ThumbnailSignal()
-
-    @QtCore.Slot()
-    def run(self):
-        pixmap = QtGui.QPixmap(self._file_path)
-        pixmap = pixmap.scaled(
-            QtCore.QSize(100, 100),
-            QtCore.Qt.KeepAspectRatio,
-            QtCore.Qt.SmoothTransformation)
-
-        self.output.result.emit((pixmap))
