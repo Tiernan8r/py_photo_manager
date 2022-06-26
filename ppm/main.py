@@ -25,7 +25,7 @@ if os.getcwd() not in sys.path:
 import logging
 import logging.config
 
-from PySide6.QtWidgets import QApplication
+from PySide6 import QtWidgets
 
 from ppm.constants import LOG_FILENAME
 from ppm.main_window import MainWindow
@@ -47,7 +47,7 @@ def main():
 
 
 def initialise_ui(logger: logging.Logger):
-    app = QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
 
     logger.debug("Launching MainWindow")
     main_window = MainWindow()

@@ -12,10 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PySide6.QtWidgets import QMainWindow, QWidget
+from PySide6 import QtWidgets
 
 
-class MainWindowComponent(QMainWindow):
+class MainWindowComponent(QtWidgets.QMainWindow):
     """
     A Class to handle the behaviour of the overall UI window
     """
@@ -30,13 +30,17 @@ class MainWindowComponent(QMainWindow):
         """
         super().__init__(*args, **kwargs)
 
+    @property
+    def ui_component(self) -> QtWidgets.QMainWindow:
+        raise NotImplementedError()
+
     def show(self):
         """
         Shows the loaded UI if hidden.
         """
         raise NotImplementedError()
 
-    def load_ui(self) -> QWidget:
+    def load_ui(self) -> QtWidgets.QWidget:
         """
         Reads the UI XML file and converts it into a QT widget,
         and returns the widget
@@ -45,8 +49,4 @@ class MainWindowComponent(QMainWindow):
             QWidget: The Main Window element of our UI, with widget
             elements laid out as defined in the UI file.
         """
-        raise NotImplementedError()
-
-    @property
-    def ui_component(self) -> QMainWindow:
         raise NotImplementedError()
