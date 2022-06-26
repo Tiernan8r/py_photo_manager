@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
+
+from ppm.workers.constants import THUMBNAIL_PIXEL_HEIGHT, THUMBNAIL_PIXEL_WIDTH
 from PySide6 import QtCore, QtGui, QtWidgets
 
 
@@ -40,8 +42,12 @@ class ThumbnailGeneratorWorker(QtCore.QRunnable):
 
     def _gen_pixmap(self) -> QtGui.QPixmap:
         pixmap = QtGui.QPixmap(self._path)
+
+        pixmap_size = QtCore.QSize(
+            THUMBNAIL_PIXEL_WIDTH, THUMBNAIL_PIXEL_HEIGHT)
+
         pixmap = pixmap.scaled(
-            QtCore.QSize(100, 100),
+            pixmap_size,
             QtCore.Qt.KeepAspectRatio,
             QtCore.Qt.SmoothTransformation)
 
