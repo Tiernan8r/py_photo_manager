@@ -157,13 +157,13 @@ class ThumbnailViewerComponent(AbstractComponent):
 
         # Deselect all thumbnails in the image selector
         for text_label_index in range(len(self.grid_layout.children())):
-            text_label = self.grid_layout.itemAtPosition(text_label_index, 0) \
-                .itemAt(1).widget()
+            text_label = self.grid_layout.itemAtPosition(
+                text_label_index, 0).itemAt(1).widget()
             text_label.setStyleSheet(
                 "background-color:none; color: black")
 
         # Select the single clicked thumbnail
-        text_label_of_thumbnail = self.grid_layout.itemAtPosition(index, 0)\
-            .itemAt(1).widget()
+        text_label_of_thumbnail = self.grid_layout.itemAtPosition(
+            index, 0).itemAt(1).widget()
         text_label_of_thumbnail.setStyleSheet(
             "background-color:blue; color: white")
