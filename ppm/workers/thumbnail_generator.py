@@ -12,10 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import os
+
+from ppm.workers.constants import THUMBNAIL_PIXEL_HEIGHT, THUMBNAIL_PIXEL_WIDTH
 from PySide6 import QtCore, QtGui
 
 
-class ThumbnailSignal(QtCore.QObject):
+class _ThumbnailSignal(QtCore.QObject):
     result = QtCore.Signal(tuple)
 
 
@@ -23,16 +26,29 @@ class ThumbnailGeneratorWorker(QtCore.QRunnable):
 
     def __init__(self, file_path: str):
         super().__init__()
-        self._file_path = file_path
+        self._path = file_path
 
-        self.output = ThumbnailSignal()
+        self.output = _ThumbnailSignal()
 
     @QtCore.Slot()
     def run(self):
-        pixmap = QtGui.QPixmap(self._file_path)
+        pixmap = self._gen_pixmap()
+
+        self.output.result.emit((pixmap))
+
+    @property
+    def file_name(self) -> str:
+        return os.path.basename(self._path)
+
+    def _gen_pixmap(self) -> QtGui.QPixmap:
+        pixmap = QtGui.QPixmap(self._path)
+
+        pixmap_size = QtCore.QSize(
+            THUMBNAIL_PIXEL_WIDTH, THUMBNAIL_PIXEL_HEIGHT)
+
         pixmap = pixmap.scaled(
-            QtCore.QSize(100, 100),
+            pixmap_size,
             QtCore.Qt.KeepAspectRatio,
             QtCore.Qt.SmoothTransformation)
 
-        self.output.result.emit((pixmap))
+        return pixmap

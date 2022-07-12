@@ -17,9 +17,10 @@ import os
 from typing import List
 
 from ppm.components import AbstractComponent
-from ppm.components.constants import FOLDER_BROWSE_BUTTON, FOLDER_PATH
-from ppm.components.thumbnail_viewer import ThumbnailViewerComponent
+from ppm.components.constants import (FOLDER_BROWSE_BUTTON, FOLDER_PATH,
+                                      FOUND_WIDGET_LOG_MESSAGE)
 from ppm.components.main_window import MainWindowComponent
+from ppm.components.thumbnail_viewer import ThumbnailViewerComponent
 from PySide6 import QtCore, QtWidgets
 
 logger = logging.getLogger(__name__)
@@ -61,17 +62,15 @@ class FileBrowserComponent(AbstractComponent):
         for lab in labels:
             if lab.objectName() == FOLDER_PATH:
                 self.folder_path_label = lab
-                logger.debug(
-                    f"Successfully found a widget for the key '{FOLDER_PATH}'")
+                logger.debug(FOUND_WIDGET_LOG_MESSAGE.format(FOLDER_PATH))
 
         buttons: List[QtWidgets.QPushButton] = \
             self.main_window.ui_component.findChildren(QtWidgets.QPushButton)
         for bt in buttons:
             if bt.objectName() == FOLDER_BROWSE_BUTTON:
                 self.browse_button = bt
-                logger.debug(
-                    f"Successfully found a widget for \
-                    the key '{FOLDER_BROWSE_BUTTON}'")
+                logger.debug(FOUND_WIDGET_LOG_MESSAGE.format(
+                    FOLDER_BROWSE_BUTTON))
 
     def set_path_label(self):
         logger.debug(

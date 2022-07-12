@@ -12,5 +12,5 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from ppm.workers.thumbnail_generator import (  # noqa: F401, E501
-    ThumbnailGeneratorWorker, ThumbnailSignal)
+from ppm.workers.thumbnail_generator import \
+    ThumbnailGeneratorWorker  # noqa: F401, E501

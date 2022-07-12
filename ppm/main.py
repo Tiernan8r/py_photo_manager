@@ -13,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import json
 import os
 import sys
 
@@ -32,13 +31,7 @@ from ppm.main_window import MainWindow
 
 
 def main():
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    logging_path = base_path + os.path.sep + LOG_FILENAME
-    print("logging path", logging_path)
-    with open(logging_path) as f:
-        dict_config = json.load(f)
-
-    logging.config.dictConfig(dict_config)
+    setup_logging()
     logger = logging.getLogger(__name__)
 
     logger.debug("Initialising UI")
@@ -46,7 +39,15 @@ def main():
     initialise_ui(logger)
 
 
+def setup_logging():
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    logging_path = base_path + os.path.sep + LOG_FILENAME
+
+    logging.config.fileConfig(logging_path, disable_existing_loggers=False)
+
+
 def initialise_ui(logger: logging.Logger):
+
     app = QtWidgets.QApplication(sys.argv)
 
     logger.debug("Launching MainWindow")

@@ -12,10 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-FOLDER_PATH = "folder_location"
-FOLDER_BROWSE_BUTTON = "browse_folder_location"
+"""
+File where all constants related to UI functionality are defined.
+"""
 
-IMAGE_THUMBNAIL_VIEW = "image_thumbnails"
-IMAGE_THUMBNAIL_CONTENTS = "image_thumbnails_contents"
-
-FOUND_WIDGET_LOG_MESSAGE = "Successfully found a widget for the key '{0}'"
+THUMBNAIL_PIXEL_WIDTH = 200
+THUMBNAIL_PIXEL_HEIGHT = 200

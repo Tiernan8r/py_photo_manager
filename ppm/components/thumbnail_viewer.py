@@ -12,13 +12,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import annotations
+
 import logging
 import os
-import typing
 from typing import List
 
 from ppm.components import AbstractComponent
-from ppm.components.constants import (IMAGE_THUMBNAIL_CONTENTS,
+from ppm.components.constants import (FOUND_WIDGET_LOG_MESSAGE,
+                                      IMAGE_THUMBNAIL_CONTENTS,
                                       IMAGE_THUMBNAIL_VIEW)
 from ppm.components.main_window import MainWindowComponent
 from ppm.workers import ThumbnailGeneratorWorker
@@ -42,7 +44,8 @@ class ThumbnailViewerComponent(AbstractComponent):
         :param **kwargs: dictionary parameters to pass to QtCore.QObject
         """
         super().__init__(main_window, *args, **kwargs)
-        self._thumbnail_generator_pool = QtCore.QThreadPool()
+        self._thread_pool = QtCore.QThreadPool()
+        self.grid_layout: QtWidgets.QGridLayout = None  # type: ignore
 
     def _find_widgets(self):
         scroll_areas: List[QtWidgets.QScrollArea] = \
@@ -51,16 +54,16 @@ class ThumbnailViewerComponent(AbstractComponent):
         for sa in scroll_areas:
             if sa.objectName() == IMAGE_THUMBNAIL_VIEW:
                 self.image_thumbnails = sa
-                logger.debug(
-                    f"Found widget for the key '{IMAGE_THUMBNAIL_VIEW}'")
+                logger.debug(FOUND_WIDGET_LOG_MESSAGE.format(
+                    IMAGE_THUMBNAIL_VIEW))
 
         widgets: List[QtWidgets.QWidget] = \
             self.main_window.ui_component.findChildren(QtWidgets.QWidget)
         for wdgt in widgets:
             if wdgt.objectName() == IMAGE_THUMBNAIL_CONTENTS:
                 self.image_thumbnail_contents = wdgt
-                logger.debug(
-                    f"Found widget for the key '{IMAGE_THUMBNAIL_CONTENTS}'")
+                logger.debug(FOUND_WIDGET_LOG_MESSAGE.format(
+                    IMAGE_THUMBNAIL_CONTENTS))
 
     def _supported_image_formats(self) -> List[str]:
         return [img.toStdString() for img in
@@ -90,29 +93,28 @@ class ThumbnailViewerComponent(AbstractComponent):
     def populate_thumbnails(self, dir: str):
         logger.debug(f"Populating image thumbnails in directory '{dir}'")
 
-        self.grid_layout = QtWidgets.QGridLayout(self.image_thumbnail_contents)
+        if self.grid_layout is None:
+            self.grid_layout = QtWidgets.QGridLayout(
+                self.image_thumbnail_contents)
 
-        row_in_grid_layout = 0
+        row_idx = 0
 
         for file in self.get_image_files(dir):
+            click_handler = ThumbnailClickHandler(
+                row_idx, file, self.grid_layout)
 
-            def custom_mouse_press(event,
-                                   index=row_in_grid_layout,
-                                   file_path=file):
-                self.on_thumbnail_click(event, index, file_path)
+            thumbnail = self._generate_pixmap(file, click_handler)
 
-            self._create_thumbnail(
-                file, custom_mouse_press, row_in_grid_layout, self.grid_layout)
+            self.grid_layout.addLayout(
+                thumbnail, row_idx, 0, QtCore.Qt.AlignCenter)
 
-            row_in_grid_layout += 1
+            row_idx += 1
 
-        logger.debug(f"DONE populating {row_in_grid_layout + 1} thumbnails")
+        logger.debug(f"DONE populating {row_idx + 1} thumbnails")
 
-    def _allocate_thumbnail(self,
-                            file_path: str,
-                            mouse_click_event: typing.Callable,
-                            row_in_grid_layout: int,
-                            grid_layout: QtWidgets.QGridLayout):
+    def _create_thumbnail(self,
+                          file_path: str,
+                          click_handler: ThumbnailClickHandler):
 
         @QtCore.Slot(tuple)
         def nested(pixmap: tuple):
@@ -127,41 +129,46 @@ class ThumbnailViewerComponent(AbstractComponent):
             img_label.setPixmap(pixmap)  # type: ignore
             text_label.setText(file_name)
 
-            img_label.mousePressEvent = mouse_click_event  # type: ignore
-            text_label.mousePressEvent = mouse_click_event  # type: ignore
+            img_label.mousePressEvent = click_handler.on_click  # type: ignore
+            text_label.mousePressEvent = click_handler.on_click  # type: ignore
 
             thumbnail = QtWidgets.QBoxLayout(
                 QtWidgets.QBoxLayout.TopToBottom)
             thumbnail.addWidget(img_label)
             thumbnail.addWidget(text_label)
 
-            grid_layout.addLayout(
-                thumbnail, row_in_grid_layout, 0, QtCore.Qt.AlignCenter)
-
         return nested
 
-    def _create_thumbnail(self,
-                          file_path: str,
-                          mouse_click_event: typing.Callable,
-                          row_in_grid_layout: int,
-                          grid_layout: QtWidgets.QGridLayout):
+    def _generate_pixmap(self,
+                         file_path: str,
+                         click_handler: ThumbnailClickHandler):
         thumbnail_generator = ThumbnailGeneratorWorker(file_path)
 
-        thumbnail_generator.output.result.connect(self._allocate_thumbnail(
-            file_path, mouse_click_event, row_in_grid_layout, grid_layout))
+        thumbnail_generator.output.result.connect(self._create_thumbnail(
+            file_path, click_handler))
 
-        self._thumbnail_generator_pool.start(thumbnail_generator)
+        self._thread_pool.start(thumbnail_generator)
 
-    def on_thumbnail_click(self, event, index, img_file_path):
-        logger.debug(f"Image '{img_file_path}' has been clicked")
+
+class ThumbnailClickHandler:
+
+    def __init__(self, index: int, file_path: str, layout: QtWidgets.QLayout):
+        self._idx = index
+        self._path = file_path
+        self._layout = layout
+
+    def on_click(self):
+        logger.debug(f"Image '{self._path}' has been clicked")
 
         # Deselect all thumbnails in the image selector
-        for text_label_index in range(len(self.grid_layout.children())):
-            text_label = self.grid_layout.itemAtPosition(text_label_index, 0) \
-                .itemAt(1).widget()
-            text_label.setStyleSheet("background-color:none;")
+        for text_label_index in range(len(self._layout.children())):
+            text_label = self._layout.itemAtPosition(
+                text_label_index, 0).itemAt(1).widget()
+            text_label.setStyleSheet(
+                "background-color:none; color: black")
 
         # Select the single clicked thumbnail
-        text_label_of_thumbnail = self.grid_layout.itemAtPosition(index, 0)\
-            .itemAt(1).widget()
-        text_label_of_thumbnail.setStyleSheet("background-color:blue;")
+        text_label_of_thumbnail = self._layout.itemAtPosition(
+            self._idx, 0).itemAt(1).widget()
+        text_label_of_thumbnail.setStyleSheet(
+            "background-color:blue; color: white")
