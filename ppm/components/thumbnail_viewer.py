@@ -45,7 +45,7 @@ class ThumbnailViewerComponent(AbstractComponent):
         """
         super().__init__(main_window, *args, **kwargs)
         self._thread_pool = QtCore.QThreadPool()
-        self.grid_layout: QtWidgets.QLayout = None
+        self.grid_layout: QtWidgets.QGridLayout = None  # type: ignore
 
     def _find_widgets(self):
         scroll_areas: List[QtWidgets.QScrollArea] = \
